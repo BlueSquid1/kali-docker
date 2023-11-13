@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+  kali-oscp:
+    build: .
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    container_name: kali-oscp
+    restart: unless-stopped
+    hostname: kali-oscp
+
+    # Needed for openvpn
+    network_mode: host
+    privileged: true
+
+    environment:
+      - DISPLAY=host.docker.internal:0
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /tmp/shared:/tmp/shared
+    command: /bin/bash
