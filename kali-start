@@ -1,3 +1,4 @@
+#!/bin/bash
 #Open Docker, only if is not running
 if (! docker ps > /dev/null 2>&1 ); then
     # On Mac OS this would be the terminal command to launch Docker
@@ -16,8 +17,11 @@ mkdir -p /tmp/shared
 # start x11 render and allow all traffic from localhost
 xhost +localhost
 
-# Check if container already exists
-if (! docker container inspect kali-oscp > /dev/null 2>&1 ); then
+if [! docker container inspect kali-oscp > /dev/null 2>&1 ]; then
+    # Container doesn't exist so create it.
     docker-compose up -d
+elif [ "$( docker container inspect -f '{{.State.Running}}' kali-oscp )" == "false" ]; then
+    # Container isn't running so restart it.
+    docker restart kali-oscp
 fi
 docker exec --user kali --workdir /home/kali -it kali-oscp /bin/bash

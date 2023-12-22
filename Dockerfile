@@ -9,9 +9,21 @@ RUN apt -y install kali-linux-default
 
 RUN apt -y update
 
+RUN gzip -d /usr/share/wordlists/rockyou.txt.gz
+
 RUN apt -y install iputils-ping
 
 RUN apt -y install firefox-esr
+
+RUN apt -y install nano
+
+RUN apt -y install gobuster
+
+RUN apt -y install seclists
+
+RUN apt -y install awscli
+
+RUN apt -y install mongodb-clients
 
 # # Clean up packages
 RUN apt-get -y autoremove
