@@ -15,6 +15,11 @@ RUN apt -y install iputils-ping
 
 RUN apt -y install firefox-esr
 
+# make it the developers edition
+RUN wget -O /tmp/firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US"
+RUN tar -xjf /tmp/firefox.tar.bz2 -C /opt/
+RUN rm -rf /tmp/firefox.tar.bz2
+
 RUN apt -y install nano
 
 RUN apt -y install gobuster
@@ -24,6 +29,8 @@ RUN apt -y install seclists
 RUN apt -y install awscli
 
 RUN apt -y install mongodb-clients
+
+RUN apt -y install maven
 
 # # Clean up packages
 RUN apt-get -y autoremove
