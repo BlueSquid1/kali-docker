@@ -32,6 +32,12 @@ RUN apt -y install mongodb-clients
 
 RUN apt -y install maven
 
+RUN apt -y install gitleaks
+
+RUN apt -y install htop
+
+# Nessus? and wappalyzer + FoxyProxy firefox extensions?
+
 # # Clean up packages
 RUN apt-get -y autoremove
 

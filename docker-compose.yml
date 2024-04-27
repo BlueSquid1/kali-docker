@@ -19,4 +19,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /tmp/shared:/tmp/shared
 
+    storage_opt:
+      size: '104G'
+
     command: /bin/bash
