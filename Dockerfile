@@ -37,5 +37,10 @@ RUN apt-get -y autoremove
 RUN useradd -G sudo kali --shell /bin/bash --create-home
 RUN echo "${USERNAME}:${PASSWORD}" | chpasswd
 
+# SSH disabled rsa recently. re-enable it
+RUN echo "HostKeyAlgorithms ssh-rsa" >> /etc/ssh/ssh_config
+RUN echo "MACs hmac-md5,hmac-sha1,umac-64@openssh.com" >> /etc/ssh/ssh_config
+
+
 # launch systemd when starting the container
 ENTRYPOINT ["/lib/systemd/systemd"]
