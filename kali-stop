@@ -1,4 +1,5 @@
 #!/bin/bash
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 if (! docker ps > /dev/null 2>&1 ); then
     echo "docker agent isn't running" >&2
     exit 1
@@ -9,4 +10,4 @@ if (! docker container inspect kali-oscp > /dev/null 2>&1 ); then
     exit 1
 fi
 
-docker stop kali-oscp
+docker-compose -f "${SCRIPT_DIR}/docker-compose.yml" stop

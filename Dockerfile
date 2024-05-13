@@ -1,60 +1,41 @@
 # We need to start from somewhere
 FROM kalilinux/kali-rolling:latest
+ARG USERNAME
+ARG PASSWORD
 ENV DEBIAN_FRONTEND noninteractive
 
 # Bring everything up to date
 RUN apt -y update && apt-get -y upgrade
 
+# install common kali tools
 RUN apt -y install kali-linux-default
 
 RUN apt -y update
 
+# install wordlists
+RUN apt -y install seclists
 RUN gzip -d /usr/share/wordlists/rockyou.txt.gz
 
-RUN apt -y install iputils-ping
+# install systemd without graphics
+RUN apt -y install systemd systemd-sysv
+RUN systemctl set-default multi-user.target
 
-RUN apt -y install firefox-esr
-
-# make it the developers edition
+# install firefox
+RUN apt -y install firefox-esr 
+# make firefox the developers edition
 RUN wget -O /tmp/firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US"
 RUN tar -xjf /tmp/firefox.tar.bz2 -C /opt/
-RUN rm -rf /tmp/firefox.tar.bz2
 
-RUN apt -y install nano
+# install other useful tools
+RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitleaks htop
+# wappalyzer + FoxyProxy firefox extensions?
 
-RUN apt -y install gobuster
-
-RUN apt -y install seclists
-
-RUN apt -y install awscli
-
-RUN apt -y install mongodb-clients
-
-RUN apt -y install maven
-
-RUN apt -y install gitleaks
-
-RUN apt -y install htop
-
-# Nessus? and wappalyzer + FoxyProxy firefox extensions?
-
-# # Clean up packages
+# Clean up packages
 RUN apt-get -y autoremove
 
+# make a Kali user
 RUN useradd -G sudo kali --shell /bin/bash --create-home
-RUN echo "kali:toor" | chpasswd
+RUN echo "${USERNAME}:${PASSWORD}" | chpasswd
 
-# Run Systemd
-RUN cd /lib/systemd/system/sysinit.target.wants/; ls | grep -v systemd-tmpfiles-setup | xargs rm -f $1 \
-  rm -f /lib/systemd/system/multi-user.target.wants/*;\
-  rm -f /etc/systemd/system/*.wants/*;\
-  rm -f /lib/systemd/system/local-fs.target.wants/*; \
-  rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
-  rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
-  rm -f /lib/systemd/system/basic.target.wants/*;\
-  rm -f /lib/systemd/system/anaconda.target.wants/*; \
-  rm -f /lib/systemd/system/plymouth*; \
-  rm -f /lib/systemd/system/systemd-update-utmp*;
-RUN systemctl set-default multi-user.target
-ENV init /lib/systemd/systemd
+# launch systemd when starting the container
 ENTRYPOINT ["/lib/systemd/systemd"]

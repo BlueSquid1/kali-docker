@@ -1,25 +1,32 @@
-version: "3.7"
-
 services:
   kali-oscp:
-    build: .
+    build:
+      context: .
+      args:
+        - USERNAME=${KALI_USERNAME}
+        - PASSWORD=${KALI_PASS}
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     container_name: kali-oscp
-    restart: unless-stopped
-    hostname: kali-oscp
 
     # Needed for openvpn
     network_mode: host
-    privileged: true
+    privileged: true # also needed for systemd
 
     environment:
       - DISPLAY=host.docker.internal:0
+
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /tmp/shared:/tmp/shared
 
-    # storage_opt:
-    #   size: '104G'
-
-    command: /bin/bash
+  nessus:
+    build: 
+      context: nessus
+      args:
+        - USERNAME=${NESSUS_USER}
+        - PASSWORD=${NESSUS_PASS}
+        - ACTIVATION_CODE=${NESSUS_ACTIVATION_CODE}
+    ports:
+      - 8834:8834
+    container_name: nessus

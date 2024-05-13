@@ -6,7 +6,7 @@ if (! docker ps > /dev/null 2>&1 ); then
     # On Mac OS this would be the terminal command to launch Docker
     open /Applications/Docker.app
     #Wait until Docker daemon is running and has completed initialisation
-    while (! docker stats --no-stream ); do
+    while (! docker stats --no-stream > /dev/null 2>&1 ); do
         # Docker takes a few seconds to initialize
         echo "Waiting for Docker to launch..."
         sleep 1
@@ -24,6 +24,6 @@ if (! docker container inspect kali-oscp > /dev/null 2>&1 ); then
     docker-compose -f "${SCRIPT_DIR}/docker-compose.yml" up -d
 elif [ "$( docker container inspect -f '{{.State.Running}}' kali-oscp )" == "false" ]; then
     # Container isn't running so restart it.
-    docker restart kali-oscp
+    docker-compose -f "${SCRIPT_DIR}/docker-compose.yml" restart
 fi
 docker exec --user kali --workdir /home/kali -it kali-oscp /bin/bash
