@@ -6,12 +6,24 @@
 
 
 ## Prerequirement 
-- XQuartz - make sure to go to settings -> security -> Allow connections from network clients. then run `xhost +localhost`
+- XQuartz - make sure to go to settings -> security -> Allow connections from network clients. then run `xhost +localhost`. Then restart XQuartz.
 - Docker for Mac
 
 ## Build instructions
 ### Build image from scratch
-```bash rebuild.sh```
+
+```
+cd kali-docker
+cat <<'EOT'> .env
+KALI_USERNAME=kali
+KALI_PASS=toor
+EOT
+
+./kali-rebuild
+```
 
 ### Launch/relaunch container
-```bash start.sh```
+`./kali-start`
+
+### Pause container
+`./kali-stop`
