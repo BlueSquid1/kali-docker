@@ -26,4 +26,4 @@ elif [ "$( docker container inspect -f '{{.State.Running}}' kali-oscp )" == "fal
     # Container isn't running so restart it.
     docker-compose -f "${SCRIPT_DIR}/docker-compose.kali.yml" restart
 fi
-docker exec --user kali --workdir /home/kali -it kali-oscp /bin/bash
+docker exec --user kali --workdir /home/kali -it kali-oscp /usr/bin/zsh

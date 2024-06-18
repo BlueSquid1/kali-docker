@@ -34,7 +34,13 @@ RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitle
 RUN apt-get -y autoremove
 
 # bug with m1 mac and XQuartz were java applications have a black screen: https://github.com/XQuartz/XQuartz/issues/31#issuecomment-2005961522
-RUN echo "export _JAVA_OPTIONS='-Dsun.java2d.xrender=false'" >> ~/.bashrc
+RUN echo "export _JAVA_OPTIONS='-Dsun.java2d.xrender=false'" >> ~/.zshrc
+
+# manual Install powershell because arm architecture isn't in apt-get :(
+RUN wget https://github.com/PowerShell/PowerShell/releases/download/v7.4.2/powershell-7.4.2-linux-arm64.tar.gz -O /tmp/powershell-arm64.tar.gz
+RUN mkdir /opt/powershell
+RUN tar -xvf /tmp/powershell-arm64.tar.gz -C /opt/powershell
+RUN echo "export PATH=/opt/powershell:$PATH" >> ~/.zshrc
 
 # make a Kali user
 RUN useradd -G sudo kali --shell /bin/bash --create-home
