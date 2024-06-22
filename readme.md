@@ -7,7 +7,7 @@
 
 ## Prerequirement 
 - XQuartz - make sure to go to settings -> security -> Allow connections from network clients. then run `xhost +localhost`. Then restart XQuartz.
-- Docker for Mac
+- Docker for Mac - make sure to go to settings -> Features in development -> Enable host networking
 
 ## Build instructions
 ### Build image from scratch

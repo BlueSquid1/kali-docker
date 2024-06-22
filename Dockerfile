@@ -20,6 +20,9 @@ RUN gzip -d /usr/share/wordlists/rockyou.txt.gz
 RUN apt -y install systemd systemd-sysv
 RUN systemctl set-default multi-user.target
 
+# update searchsploit database just incase
+RUN apt -y update && apt -y install exploitdb
+
 # install firefox
 RUN apt -y install firefox-esr 
 # make firefox the developers edition
@@ -34,13 +37,13 @@ RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitle
 RUN apt-get -y autoremove
 
 # bug with m1 mac and XQuartz were java applications have a black screen: https://github.com/XQuartz/XQuartz/issues/31#issuecomment-2005961522
-RUN echo "export _JAVA_OPTIONS='-Dsun.java2d.xrender=false'" >> ~/.zshrc
+RUN echo "export _JAVA_OPTIONS='-Dsun.java2d.xrender=false'" >> /home/kali/.zshrc
 
 # manual Install powershell because arm architecture isn't in apt-get :(
 RUN wget https://github.com/PowerShell/PowerShell/releases/download/v7.4.2/powershell-7.4.2-linux-arm64.tar.gz -O /tmp/powershell-arm64.tar.gz
 RUN mkdir /opt/powershell
 RUN tar -xvf /tmp/powershell-arm64.tar.gz -C /opt/powershell
-RUN echo "export PATH=/opt/powershell:$PATH" >> ~/.zshrc
+RUN echo "export PATH=/opt/powershell:$PATH" >> /home/kali/.zshrc
 
 # make a Kali user
 RUN useradd -G sudo kali --shell /bin/bash --create-home

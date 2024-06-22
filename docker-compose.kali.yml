@@ -9,9 +9,8 @@ services:
     tty: true        # docker run -t
     container_name: kali-oscp
 
-    # Needed for openvpn
-    network_mode: host
-    privileged: true # also needed for systemd
+    network_mode: host # needed if running openvpn in the container
+    privileged: true # needed for systemd
 
     environment:
       - DISPLAY=host.docker.internal:0
