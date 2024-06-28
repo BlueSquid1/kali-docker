@@ -30,7 +30,7 @@ RUN wget -O /tmp/firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-
 RUN tar -xjf /tmp/firefox.tar.bz2 -C /opt/
 
 # install other useful tools
-RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitleaks htop burpsuite
+RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitleaks htop burpsuite python3.11-venv gdb
 # wappalyzer + FoxyProxy firefox extensions?
 
 # Clean up packages
