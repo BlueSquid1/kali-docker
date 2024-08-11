@@ -30,11 +30,15 @@ RUN wget -O /tmp/firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-
 RUN tar -xjf /tmp/firefox.tar.bz2 -C /opt/
 
 # install other useful tools
-RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitleaks htop burpsuite python3.11-venv gdb
+RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitleaks htop burpsuite python3.11-venv gdb peass chisel ncat
 # wappalyzer + FoxyProxy firefox extensions?
 
 # Clean up packages
 RUN apt-get -y autoremove
+
+# make a Kali user
+RUN useradd -G sudo kali --shell /usr/bin/zsh --create-home
+RUN echo "${USERNAME}:${PASSWORD}" | chpasswd
 
 # bug with m1 mac and XQuartz were java applications have a black screen: https://github.com/XQuartz/XQuartz/issues/31#issuecomment-2005961522
 RUN echo "export _JAVA_OPTIONS='-Dsun.java2d.xrender=false'" >> /home/kali/.zshrc
@@ -45,12 +49,8 @@ RUN mkdir /opt/powershell
 RUN tar -xvf /tmp/powershell-arm64.tar.gz -C /opt/powershell
 RUN echo "export PATH=/opt/powershell:$PATH" >> /home/kali/.zshrc
 
-# make a Kali user
-RUN useradd -G sudo kali --shell /bin/bash --create-home
-RUN echo "${USERNAME}:${PASSWORD}" | chpasswd
-
 # SSH disabled rsa recently. re-enable it
-RUN echo "HostKeyAlgorithms ssh-rsa" >> /etc/ssh/ssh_config
+RUN echo "HostKeyAlgorithms +ssh-rsa" >> /etc/ssh/ssh_config
 RUN echo "MACs hmac-md5,hmac-sha1,umac-64@openssh.com" >> /etc/ssh/ssh_config
 
 

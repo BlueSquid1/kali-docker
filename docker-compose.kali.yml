@@ -16,5 +16,5 @@ services:
       - DISPLAY=host.docker.internal:0
 
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - /tmp/shared:/tmp/shared
+      - ~/shared:/home/kali/shared
+      - /tmp/.X11-unix:/tmp/.X11-unix # needed for X11 forwarding

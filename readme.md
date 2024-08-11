@@ -22,7 +22,7 @@ EOT
 ./kali-rebuild
 ```
 
-### Launch/relaunch container
+### Launch container
 `./kali-start`
 
 ### Pause container
