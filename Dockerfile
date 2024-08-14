@@ -16,21 +16,21 @@ RUN apt -y update
 RUN apt -y install seclists
 RUN gzip -d /usr/share/wordlists/rockyou.txt.gz
 
+# update searchsploit database
+RUN apt -y update && apt -y install exploitdb
+
 # install systemd without graphics
 RUN apt -y install systemd systemd-sysv
 RUN systemctl set-default multi-user.target
 
-# update searchsploit database just incase
-RUN apt -y update && apt -y install exploitdb
+# install other useful tools
+RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitleaks htop burpsuite python3.11-venv gdb peass chisel ncat
 
 # install firefox
 RUN apt -y install firefox-esr 
 # make firefox the developers edition
 RUN wget -O /tmp/firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US"
 RUN tar -xjf /tmp/firefox.tar.bz2 -C /opt/
-
-# install other useful tools
-RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitleaks htop burpsuite python3.11-venv gdb peass chisel ncat
 # wappalyzer + FoxyProxy firefox extensions?
 
 # Clean up packages
@@ -53,6 +53,8 @@ RUN echo "export PATH=/opt/powershell:$PATH" >> /home/kali/.zshrc
 RUN echo "HostKeyAlgorithms +ssh-rsa" >> /etc/ssh/ssh_config
 RUN echo "MACs hmac-md5,hmac-sha1,umac-64@openssh.com" >> /etc/ssh/ssh_config
 
+# Start metasploit database service
+RUN msfdb init
 
 # launch systemd when starting the container
 ENTRYPOINT ["/lib/systemd/systemd"]
