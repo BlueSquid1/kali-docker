@@ -1,0 +1,27 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import os
+
+def main():
+    parser = argparse.ArgumentParser(
+                    prog='generic scanner',
+                    description='Generic scanner')
+    parser.add_argument('-r', '--replace', help="string to replace with ip address", default="{}")
+    parser.add_argument('targetfile', help="file that contains targets to scan")
+    parser.add_argument('command', help="command to run", nargs=argparse.REMAINDER)
+    args = parser.parse_args()
+    replacementString = args.replace
+    commandTemplate = ' '.join(args.command)
+    targetFile = args.targetfile
+    with open(targetFile) as f:
+        targets = f.read().splitlines()
+
+    for target in targets:
+        commandString = commandTemplate.replace(replacementString, target)
+        print(f"running: {commandString}")
+        os.system(commandString)
+
+if __name__ == '__main__':
+    main()
