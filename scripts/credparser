@@ -1,0 +1,42 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser(
+                    prog='Credential Parser',
+                    description='parsers a credential file to generate a users.txt and passwords.txt file')
+    parser.add_argument('credfile', help="file that contains credentials. each line has format <username><delimitator><password>")
+    parser.add_argument('-d', '--delimitator', help="delimitator charactor to use to seperate username from password", default=":")
+    parser.add_argument('-p', '--passwordfile', help="the name for the password file", default="passwords.txt")
+    parser.add_argument('-u', '--usernamefile', help="the name for the username file", default="users.txt")
+    args = parser.parse_args()
+    delimitator = args.delimitator
+    credFile = args.credfile
+    passwordFile = args.passwordfile
+    usernameFile = args.usernamefile
+    creds = []
+    with open(credFile, 'r') as f:
+        creds = f.read().splitlines()
+
+    usernames = []
+    passwords = []
+    for cred in creds:
+        parts = cred.split(delimitator)
+        username = parts[0]
+        password = delimitator.join(parts[1:])
+
+        if username != "":
+            usernames.append(username)
+        if password != "":
+            passwords.append(password.strip())
+    
+    
+    with open(passwordFile, 'w') as f:
+        f.write("\n".join(passwords))
+    
+    with open(usernameFile, 'w') as f:
+        f.write("\n".join(usernames))
+
+if __name__ == '__main__':
+    main()
