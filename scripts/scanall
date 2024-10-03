@@ -3,25 +3,76 @@
 
 import argparse
 import os
+import re
+
+usernameFilePath = "/tmp/users.txt"
+passwordFilePath = "/tmp/pass.txt"
 
 def main():
     parser = argparse.ArgumentParser(
                     prog='generic scanner',
                     description='Generic scanner')
-    parser.add_argument('-r', '--replace', help="string to replace with ip address", default="{}")
-    parser.add_argument('targetfile', help="file that contains targets to scan")
-    parser.add_argument('command', help="command to run", nargs=argparse.REMAINDER)
+    parser.add_argument('credfile', help="file that contains creds. each row has the format <username>:<password>")
+    parser.add_argument('command', help="command to run. Use {user}/{pass} to replace with each username/password and {user_file}/{pass_file} to generate a temp file with usernames/passwords", nargs=argparse.REMAINDER)
     args = parser.parse_args()
-    replacementString = args.replace
+    credFile = args.credfile
     commandTemplate = ' '.join(args.command)
-    targetFile = args.targetfile
-    with open(targetFile) as f:
-        targets = f.read().splitlines()
+    usernames = []
+    passwords = []
+    with open(credFile) as f:
+        for cred in f:
+            parts = cred.strip().split(':')
+            username = parts[0]
+            password = ":".join(parts[1:])
+            usernames.append(username)
+            passwords.append(password)
 
-    for target in targets:
-        commandString = commandTemplate.replace(replacementString, target)
-        print(f"running: {commandString}")
-        os.system(commandString)
+    userFilePattern = "{user_file}"
+    passFilePattern = "{pass_file}"
+    userFileMatch = re.search(userFilePattern, commandTemplate)
+    passFileMatch = re.search(passFilePattern, commandTemplate)
+
+    # handle username file generation
+    if userFileMatch is not None:
+        with open(usernameFilePath, "w") as f:
+            f.write("\n".join(usernames))        
+        commandTemplate = re.sub(userFilePattern, usernameFilePath, commandTemplate)
+
+    # handle password file generation
+    if passFileMatch is not None:
+        with open(passwordFilePath, "w") as f:
+            f.write("\n".join(passwords))
+        commandTemplate = re.sub(passFilePattern, passwordFilePath, commandTemplate)
+
+    # determine if running 1 command or the command multiple times
+    userCredPattern = "{user}"
+    passCredPattern = "{pass}"
+    credMatch = re.search(f"{userCredPattern}|{passCredPattern}", commandTemplate)
+    if credMatch is not None:
+        # execute command multiple times
+        if len(usernames) != len(passwords):
+            print(f"length of usernames: {len(usernames)} does not equal length of passwords: {len(passwords)}")
+            return
+        
+        for i in range(len(usernames)):
+            commandString = re.sub(userCredPattern, usernames[i], commandTemplate)
+            commandString = re.sub(passCredPattern, passwords[i], commandString)
+            print(f"running: {commandString}")
+            os.system(commandString)
+            
+    else:
+        # execute once
+        print(f"running: {commandTemplate}")
+        os.system(commandTemplate)
+
+
+
+    # clean up tmp files
+    if userFileMatch is not None:
+        os.remove(usernameFilePath)
+
+    if passFileMatch is not None:
+        os.remove(passwordFilePath)
 
 if __name__ == '__main__':
     main()

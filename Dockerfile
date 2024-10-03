@@ -24,7 +24,7 @@ RUN apt -y install systemd systemd-sysv
 RUN systemctl set-default multi-user.target
 
 # install other useful tools
-RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitleaks htop burpsuite python3.11-venv gdb peass chisel ncat bloodhound golang-go freerdp3-x11
+RUN apt -y install iputils-ping nano gobuster awscli mongodb-clients maven gitleaks htop burpsuite python3.11-venv gdb peass chisel ncat bloodhound golang-go freerdp3-x11 p7zip-full
 
 # install kerbrute
 RUN GOBIN=/usr/local/bin go install github.com/ropnop/kerbrute@latest
