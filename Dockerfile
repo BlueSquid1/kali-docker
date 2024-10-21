@@ -56,6 +56,11 @@ RUN echo "export PATH=/opt/powershell:$PATH" >> /home/kali/.bashrc
 RUN echo "HostKeyAlgorithms +ssh-rsa" >> /etc/ssh/ssh_config
 RUN echo "MACs hmac-md5,hmac-sha1,umac-64@openssh.com" >> /etc/ssh/ssh_config
 
+# install human readable names for SNMP instead of numeric object IDs
+RUN apt -y install snmp-mibs-downloader
+RUN download-mibs
+RUN echo "" > /etc/snmp/snmp.conf
+
 # xfreerdp will assume the X11 client is running linux. If you are using Apple as your host
 # you will need to remap the key codes from from apple to linux. Usage:
 # xfreerdp /v:<ip-address> $REMAP

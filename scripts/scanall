@@ -27,26 +27,40 @@ def main():
             usernames.append(username)
             passwords.append(password)
 
-    userFilePattern = "{user_file}"
-    passFilePattern = "{pass_file}"
+    userFilePattern = "{.*?user_file.*?}"
+    passFilePattern = "{.*?pass_file.*?}"
     userFileMatch = re.search(userFilePattern, commandTemplate)
     passFileMatch = re.search(passFilePattern, commandTemplate)
 
     # handle username file generation
     if userFileMatch is not None:
         with open(usernameFilePath, "w") as f:
-            f.write("\n".join(usernames))        
-        commandTemplate = re.sub(userFilePattern, usernameFilePath, commandTemplate)
+            unique_usernames = []
+            for username in usernames:
+                if username not in unique_usernames:
+                    unique_usernames.append(username)
+            f.write("\n".join(unique_usernames))
+        stringMatch = userFileMatch.group()
+        matchWithFile = stringMatch.replace("user_file", usernameFilePath)
+        matchWithFile = matchWithFile[1:-1]
+        commandTemplate = re.sub(userFilePattern, matchWithFile, commandTemplate)
 
     # handle password file generation
     if passFileMatch is not None:
         with open(passwordFilePath, "w") as f:
-            f.write("\n".join(passwords))
-        commandTemplate = re.sub(passFilePattern, passwordFilePath, commandTemplate)
+            unique_passwords = []
+            for password in passwords:
+                if password not in unique_passwords:
+                    unique_passwords.append(password)
+            f.write("\n".join(unique_passwords))
+        stringMatch = passFileMatch.group()
+        matchWithFile = stringMatch.replace("pass_file", passwordFilePath)
+        matchWithFile = matchWithFile[1:-1]
+        commandTemplate = re.sub(passFilePattern, matchWithFile, commandTemplate)
 
     # determine if running 1 command or the command multiple times
-    userCredPattern = "{user}"
-    passCredPattern = "{pass}"
+    userCredPattern = "{.*?user.*?}"
+    passCredPattern = "{.*?pass.*?}"
     credMatch = re.search(f"{userCredPattern}|{passCredPattern}", commandTemplate)
     if credMatch is not None:
         # execute command multiple times
@@ -55,8 +69,26 @@ def main():
             return
         
         for i in range(len(usernames)):
-            commandString = re.sub(userCredPattern, usernames[i], commandTemplate)
-            commandString = re.sub(passCredPattern, passwords[i], commandString)
+            commandString = commandTemplate
+            userMatch = re.search(userCredPattern, commandString)
+            if userMatch is not None:
+                stringMatch = userMatch.group()
+                matchWithUser = ""
+                if len(usernames[i]) > 0:
+                    matchWithUser = stringMatch.replace("user", usernames[i])
+                    matchWithUser = matchWithUser[1:-1]
+                commandString = re.sub(userCredPattern, matchWithUser, commandString)
+
+
+            passMatch = re.search(passCredPattern, commandString)
+            if passMatch is not None:
+                stringMatch = passMatch.group()
+                matchWithPass = ""
+                if len(passwords[i]) > 0:
+                    matchWithPass = stringMatch.replace("pass", passwords[i])
+                    matchWithPass = matchWithPass[1:-1]
+                commandString = re.sub(passCredPattern, matchWithPass, commandString)
+
             print(f"running: {commandString}")
             os.system(commandString)
             
