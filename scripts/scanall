@@ -4,9 +4,47 @@
 import argparse
 import os
 import re
+import subprocess
 
 usernameFilePath = "/tmp/users.txt"
 passwordFilePath = "/tmp/pass.txt"
+
+def replaceTemplateWithUsername(template, username):
+    userCredPattern = "{.*?user.*?}"
+    userMatch = re.search(userCredPattern, template)
+    if userMatch is None:
+        raise Exception("could not replace username because did not exist")
+        
+    stringMatch = userMatch.group()
+    matchWithUser = ""
+    if len(username) > 0:
+        matchWithUser = stringMatch.replace("user", username)
+        matchWithUser = matchWithUser[1:-1]
+    return re.sub(userCredPattern, matchWithUser, template)
+
+
+
+def replaceTemplateWithPassword(template, password):
+    passCredPattern = "{.*?pass.*?}"
+    passMatch = re.search(passCredPattern, template)
+    if passMatch is None:
+        raise Exception("could not replace password because did not exist")
+    
+    stringMatch = passMatch.group()
+    matchWithPass = ""
+    if len(password) > 0:
+        matchWithPass = stringMatch.replace("pass", password)
+        matchWithPass = matchWithPass[1:-1]
+    return re.sub(passCredPattern, matchWithPass, template)
+
+seenValues = []
+def shouldSkipValue(value):
+    if value == "":
+        return True
+    if value in seenValues:
+        return True
+    seenValues.append(value)
+    return False
 
 def main():
     parser = argparse.ArgumentParser(
@@ -21,7 +59,14 @@ def main():
     passwords = []
     with open(credFile) as f:
         for cred in f:
-            parts = cred.strip().split(':')
+            # Remove comments
+            cred = re.sub("\s#.*$" , "", cred)
+            # Remove leading and trailing spaces
+            cred = cred.strip()
+            if cred == "":
+                # Skip empty cred lines
+                continue
+            parts = cred.split(':')
             username = parts[0]
             password = ":".join(parts[1:])
             usernames.append(username)
@@ -61,8 +106,9 @@ def main():
     # determine if running 1 command or the command multiple times
     userCredPattern = "{.*?user.*?}"
     passCredPattern = "{.*?pass.*?}"
-    credMatch = re.search(f"{userCredPattern}|{passCredPattern}", commandTemplate)
-    if credMatch is not None:
+    userMatch = re.search(f"{userCredPattern}", commandTemplate)
+    passMatch = re.search(f"{passCredPattern}", commandTemplate)
+    if userMatch is not None or passMatch is not None:
         # execute command multiple times
         if len(usernames) != len(passwords):
             print(f"length of usernames: {len(usernames)} does not equal length of passwords: {len(passwords)}")
@@ -70,32 +116,32 @@ def main():
         
         for i in range(len(usernames)):
             commandString = commandTemplate
-            userMatch = re.search(userCredPattern, commandString)
-            if userMatch is not None:
-                stringMatch = userMatch.group()
-                matchWithUser = ""
-                if len(usernames[i]) > 0:
-                    matchWithUser = stringMatch.replace("user", usernames[i])
-                    matchWithUser = matchWithUser[1:-1]
-                commandString = re.sub(userCredPattern, matchWithUser, commandString)
+            if userMatch is not None and passMatch is not None:
+                # Sniper attack
+                commandString = replaceTemplateWithUsername(commandString, usernames[i])
+                commandString = replaceTemplateWithPassword(commandString, passwords[i])
+            elif  userMatch is not None:
+                # Password spray attack
+                if shouldSkipValue(usernames[i]):
+                    continue
+                commandString = replaceTemplateWithUsername(commandString, usernames[i])
+            elif passMatch is not None:
+                # Username spray attack
+                if shouldSkipValue(passwords[i]):
+                    continue
+                commandString = replaceTemplateWithPassword(commandString, passwords[i])
+            else:
+                raise Exception("unknown password attack")
 
-
-            passMatch = re.search(passCredPattern, commandString)
-            if passMatch is not None:
-                stringMatch = passMatch.group()
-                matchWithPass = ""
-                if len(passwords[i]) > 0:
-                    matchWithPass = stringMatch.replace("pass", passwords[i])
-                    matchWithPass = matchWithPass[1:-1]
-                commandString = re.sub(passCredPattern, matchWithPass, commandString)
-
+            print("")
             print(f"running: {commandString}")
-            os.system(commandString)
+            subprocess.Popen(commandString, shell=True).wait()
             
     else:
         # execute once
+        print("")
         print(f"running: {commandTemplate}")
-        os.system(commandTemplate)
+        subprocess.Popen(commandTemplate, shell=True).wait()
 
 
 
