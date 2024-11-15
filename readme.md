@@ -1,13 +1,11 @@
 # Running Kali linux on a docker container for macOS
 
-## TODO
-- make sure regular user has sudo
-- install kali tools
-
+## Description
+This repo install kali linux and all the tools needed to do the OSCP exam.
 
 ## Prerequirement 
 - XQuartz - make sure to go to settings -> security -> Allow connections from network clients. then run `xhost +localhost`. Then restart XQuartz.
-- Docker for Mac - make sure to go to settings -> Features in development -> Enable host networking
+- Docker for Mac
 
 ## Build instructions
 ### Build image from scratch
@@ -22,8 +20,8 @@ EOT
 ./kali-rebuild
 ```
 
-### Launch container
+### Launch Kali Linux
 `./kali-start`
 
-### Pause container
+### Pause Kali Linux
 `./kali-stop`

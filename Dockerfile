@@ -69,7 +69,6 @@ RUN echo "export REMAP=/kbd:remap:8=30,remap:9=31,remap:10=32,remap:11=33,remap:
 RUN echo "export PROMPT_COMMAND='history -a'"
 
 COPY ./scripts/scanall /usr/local/bin/scanall
-COPY ./scripts/credparser /usr/local/bin/credparser
 
 # launch systemd when starting the container
 ENTRYPOINT ["/lib/systemd/systemd"]
